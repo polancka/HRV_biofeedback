@@ -1,16 +1,17 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QListWidget
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QListWidget, QComboBox
 from PyQt6.QtCore import QTimer, Qt
 import asyncio
 from bleak import BleakScanner, BleakClient
 import sys
 from compute_lf_hf import compute_lf_hf
+from breathing_pacer import BreathingPacer 
 
 class HeartRateMonitorApp(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Heart Rate Monitor")
-        self.setGeometry(100, 100, 400, 300)
-        
+        self.setGeometry(100, 100, 600, 500)
+    
         self.layout = QVBoxLayout()
         
         # Welcome Label
@@ -23,22 +24,38 @@ class HeartRateMonitorApp(QWidget):
         self.btn_connect.clicked.connect(self.scan_devices)
         self.layout.addWidget(self.btn_connect)
         
-        self.btn_start = QPushButton("Start Recording", self)
+        self.btn_start = QPushButton("Start recording", self)
         self.btn_start.setEnabled(False)
         self.btn_start.clicked.connect(self.toggle_recording)
         self.layout.addWidget(self.btn_start)
+
+        self.btn_start_pacer = QPushButton("Start breathing pacer", self)
+        self.btn_start_pacer.clicked.connect(self.start_pacer)
+        self.layout.addWidget(self.btn_start_pacer)
         
         # Device List
         self.device_list = QListWidget(self)
         self.device_list.itemClicked.connect(self.connect_to_device)
         self.layout.addWidget(self.device_list)
         self.device_list.hide()
+
+        # Dropdown for Breathing Rate Selection
+        self.breathing_rate_dropdown = QComboBox(self)
+        self.breathing_rates = [4.5, 5.0, 5.5, 6.0, 6.5]  # Different breathing rates
+        self.breathing_rate_dropdown.addItems([f"{rate} breaths/min" for rate in self.breathing_rates])
+        self.breathing_rate_dropdown.currentIndexChanged.connect(self.update_breathing_rate)
+        self.layout.addWidget(self.breathing_rate_dropdown)
+
+        # Breathing Pacer Widget
+        self.pacer = BreathingPacer(self)
+        self.layout.addWidget(self.pacer, alignment=Qt.AlignmentFlag.AlignCenter)
+
         
         # Heart Rate Label
         self.hr_label = QLabel("Heart Rate: -- BPM", self)
         self.hr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.hr_label)
-        
+
         self.setLayout(self.layout)
         
         #RR intervals 
@@ -79,6 +96,16 @@ class HeartRateMonitorApp(QWidget):
         self.device_list.hide()
         self.btn_start.setEnabled(True)
         self.label.setText(f"Connected to {device_info[0]}")
+
+    def start_pacer(self):
+        """Start or reset the breathing pacer."""
+        selected_rate = self.breathing_rates[self.breathing_rate_dropdown.currentIndex()]
+        self.pacer.set_breathing_rate(selected_rate)
+
+    def update_breathing_rate(self):
+        """Update pacer speed when a new rate is selected."""
+        selected_rate = self.breathing_rates[self.breathing_rate_dropdown.currentIndex()]
+        self.pacer.set_breathing_rate(selected_rate)
     
     def toggle_recording(self):
         """Starts or stops heart rate recording."""
