@@ -10,13 +10,19 @@ The application was developed and tested with:
 ## Instalation
 The use of a virtual Python environment such as conda or venv is advised. 
 The repository can be cloned by running: 
-`pip install git+https://github.com/polancka/HRV_biofeedback.git`
+```
+pip install git+https://github.com/polancka/HRV_biofeedback.git
+```
 
 Install the necessary libraries: 
-`pip install -r requirements.txt`
+```
+pip install -r requirements.txt
+```
 
 The application can be started with:
-`python main.py`
+```
+python main.py
+```
 
 ## User guide
 1. Connecting the Polar: 
