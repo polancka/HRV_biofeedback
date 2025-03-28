@@ -30,7 +30,7 @@ class HeartRateMonitorApp(QWidget):
         self.layout.addWidget(self.btn_start)
 
         self.btn_start_pacer = QPushButton("Start breathing pacer", self)
-        self.btn_start_pacer.clicked.connect(self.start_pacer)
+        self.btn_start_pacer.clicked.connect(self.start_stop_pacer)
         self.layout.addWidget(self.btn_start_pacer)
         
         # Device List
@@ -47,6 +47,7 @@ class HeartRateMonitorApp(QWidget):
         self.layout.addWidget(self.breathing_rate_dropdown)
 
         # Breathing Pacer Widget
+        self.pacer_on = False
         self.pacer = BreathingPacer(self)
         self.layout.addWidget(self.pacer, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -60,14 +61,14 @@ class HeartRateMonitorApp(QWidget):
         
         #RR intervals 
         self.rr_data = [] 
-        self.rr_label = QLabel("RR Intervals: --", self)
+        self.rr_label = QLabel("Average RR Interval: --", self)
         self.rr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.rr_label)
 
         #LF/HF 
-        self.lf_hf_label = QLabel("LF/HF: --", self)
-        self.lf_hf_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.layout.addWidget(self.lf_hf_label)
+        #self.lf_hf_label = QLabel("LF/HF: --", self)
+        #self.lf_hf_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        #self.layout.addWidget(self.lf_hf_label)
 
 
         # Bluetooth Variables
@@ -97,10 +98,17 @@ class HeartRateMonitorApp(QWidget):
         self.btn_start.setEnabled(True)
         self.label.setText(f"Connected to {device_info[0]}")
 
-    def start_pacer(self):
-        """Start or reset the breathing pacer."""
-        selected_rate = self.breathing_rates[self.breathing_rate_dropdown.currentIndex()]
-        self.pacer.set_breathing_rate(selected_rate)
+    def start_stop_pacer(self):
+        """Start or stops the breathing pacer."""
+        if self.pacer_on :
+            self.pacer_on = False
+            self.btn_start_pacer.setText("Start recording")
+            self.pacer.stop_pacer()
+        else: 
+            self.pacer_on = True
+            self.btn_start_pacer.setText("Stop recording")
+            selected_rate = self.breathing_rates[self.breathing_rate_dropdown.currentIndex()]
+            self.pacer.set_breathing_rate(selected_rate)
 
     def update_breathing_rate(self):
         """Update pacer speed when a new rate is selected."""

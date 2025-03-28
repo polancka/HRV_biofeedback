@@ -37,6 +37,13 @@ class BreathingPacer(QWidget):
         self.phase = "inhale"
         self.timer.start(50)  # Refresh every 50ms for smoother animation
 
+    def stop_pacer(self):
+        """Stops the pacer animation and resets the line."""
+        self.timer.stop()  # Stop the animation
+        self.phase = "inhale"  # Reset phase
+        self.end_y = 250  # Reset line to start position
+        self.update()  # Trigger repaint
+
     def update_pacer(self):
         """Updates the pacer animation by adjusting the line length."""
         if self.phase == "inhale":
