@@ -43,7 +43,7 @@ class HeartRateMonitorApp(QWidget):
         self.breathing_rate_dropdown = QComboBox(self)
         self.breathing_rates = [4.5, 5.0, 5.5, 6.0, 6.5]  # Different breathing rates
         self.breathing_rate_dropdown.addItems([f"{rate} breaths/min" for rate in self.breathing_rates])
-        self.breathing_rate_dropdown.currentIndexChanged.connect(self.update_breathing_rate)
+        self.breathing_rate_dropdown.currentIndexChanged.connect(self.start_stop_pacer)
         self.layout.addWidget(self.breathing_rate_dropdown)
 
         # Breathing Pacer Widget
@@ -102,18 +102,13 @@ class HeartRateMonitorApp(QWidget):
         """Start or stops the breathing pacer."""
         if self.pacer_on :
             self.pacer_on = False
-            self.btn_start_pacer.setText("Start recording")
+            self.btn_start_pacer.setText("Start breathing pacer")
             self.pacer.stop_pacer()
         else: 
             self.pacer_on = True
-            self.btn_start_pacer.setText("Stop recording")
+            self.btn_start_pacer.setText("Stop breathing pacer")
             selected_rate = self.breathing_rates[self.breathing_rate_dropdown.currentIndex()]
             self.pacer.set_breathing_rate(selected_rate)
-
-    def update_breathing_rate(self):
-        """Update pacer speed when a new rate is selected."""
-        selected_rate = self.breathing_rates[self.breathing_rate_dropdown.currentIndex()]
-        self.pacer.set_breathing_rate(selected_rate)
     
     def toggle_recording(self):
         """Starts or stops heart rate recording."""
